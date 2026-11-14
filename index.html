@@ -71,11 +71,11 @@ vec2 gas(float r, float ang, float seed) {
   return vec2(n * 0.6 + fine * 0.4, e);
 }
 
-// paleta de fogo: vermelho profundo -> laranja -> amarelo -> branco quente
+// paleta roxa: índigo profundo -> violeta -> orquídea -> lavanda quase branca
 vec3 fire(float x) {
-  return vec3(smoothstep(0.0, 0.33, x),
-              smoothstep(0.14, 0.78, x) * 0.96,
-              smoothstep(0.58, 1.0, x) * 0.78);
+  return vec3(smoothstep(0.0, 0.75, x) * 0.92,
+              smoothstep(0.40, 1.0, x) * 0.88,
+              smoothstep(0.0, 0.30, x));
 }
 
 // emissão do disco no ponto p; v = direção do raio
@@ -128,7 +128,7 @@ vec3 stars(vec3 d) {
   vec2 o = (vec2(hash(i + 7.1), hash(i + 3.7)) - 0.5) * 0.7;
   float b = smoothstep(0.07, 0.0, length(f - o)) * step(0.86, h);
   float tw = 0.75 + 0.25 * sin(uTime * (1.0 + 3.0 * hash(i + 9.9)) + h * 40.0);
-  return vec3(1.0, 0.9, 0.8) * b * (0.15 + 0.6 * hash(i + 1.3)) * tw;
+  return vec3(0.9, 0.9, 1.0) * b * (0.15 + 0.6 * hash(i + 1.3)) * tw;
 }
 
 void main() {
@@ -188,7 +188,7 @@ void main() {
 
   // a sombra aparece como um círculo limpo: o gás à frente dela só a tinge de laranja
   // o disco da frente só encobre a parte de baixo da sombra
-  if (hit > 0.5) { col *= smoothstep(-0.075, -0.14, ruv.y); haze = 0.0; col += vec3(0.10, 0.05, 0.0); }
+  if (hit > 0.5) { col *= smoothstep(-0.075, -0.14, ruv.y); haze = 0.0; col += vec3(0.06, 0.0, 0.12); }
   else {
     col += trans * stars(normalize(v));
     // anel de fótons: linha fina e clara colada na sombra
@@ -196,16 +196,16 @@ void main() {
     // (uma faixa laranja estreita separa o anel do gás claro atrás dele)
     float top = smoothstep(-0.15, -0.05, ruv.y);   // some atrás do disco na parte de baixo
     float gap = exp(-pow((b - 2.78) / 0.07, 2.0)) * top;
-    col = mix(col, col * vec3(1.0, 0.5, 0.12), 0.8 * gap);
+    col = mix(col, col * vec3(0.55, 0.25, 1.0), 0.8 * gap);
     float ring = exp(-pow((b - 2.66) / 0.022, 2.0)) * top;
-    col += ring * vec3(1.0, 0.95, 0.8);
+    col += ring * vec3(0.95, 0.88, 1.0);
   }
-  col += vec3(1.0, 0.24, 0.02) * haze * 0.17;
+  col += vec3(0.5, 0.08, 1.0) * haze * 0.17;
 
   // brilho geral (alongado na direção do disco) — tinge a sombra e o fundo de vermelho-alaranjado
   float g = exp(-length(ruv * vec2(1.25, 2.6)) * 1.0) * 1.3;
   float g2 = exp(-length(ruv * vec2(1.0, 2.2)) * 3.2);
-  col += vec3(0.95, 0.10, 0.0) * g * 0.34 + vec3(0.85, 0.42, 0.03) * g2 * 0.5;
+  col += vec3(0.42, 0.0, 0.85) * g * 0.34 + vec3(0.55, 0.15, 0.9) * g2 * 0.5;
 
   col = min(col, vec3(1.0));
   float vig = smoothstep(1.45, 0.35, length(uv));
